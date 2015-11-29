@@ -1,0 +1,8 @@
+[Unit]
+Description=My Automount Script
+
+[Service]
+ExecStart=/home/rees/scripts/automount.sh
+
+[Install]
+WantedBy=multi-user.target
