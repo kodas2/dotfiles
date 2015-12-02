@@ -1,0 +1,52 @@
+#!/bin/bash
+
+#TODO: Volume action doesn't work, weird output on second activation, crash on third
+#xprop -spy on the window names, for instant update?
+#Volnoti?
+
+WINDOW_NAME_SEP=" "
+WINDOW_NAME_MAX_LEN=20
+FOCUS_WINDOW_COL="#6d6d6d"
+
+get_time() {
+    echo $(date +'%d/%m/%y %R')
+} 
+
+get_volume() {
+    echo $(amixer sget Master | head  -n 6 | tail -n 1 | sed 's/.*\[\([0-9]\{1,3\}%\)\].*/\1/' | tr -d "\n")
+}
+
+get_bat_level() {
+    echo "100 * $(cat /sys/class/power_supply/BAT0/energy_now) / $(cat /sys/class/power_supply/BAT0/energy_full)" | bc | tr "\n" "%"
+}
+
+get_bat_status() {
+    echo $(cat /sys/class/power_supply/BAT0/status)
+}
+
+get_window_titles() {
+    WINDOW_IDS=$(xprop -root | grep '_NET_CLIENT_LIST(WINDOW):' | sed 's/.*# \(.*\)/\1/' | sed 's/,//g')
+    CURR_FOCUS=$(xprop -root | grep '_NET_ACTIVE_WINDOW(WINDOW)' | sed 's/.*# \(.*\)/\1/')
+    for w in $WINDOW_IDS; do
+        WINDOW_NAME="$(xprop -id $w 2>/dev/null | grep 'WM_NAME' | head -n 1 | sed 's/[^\"]*\"\(.*\)\"$/\1/')"
+        if [ "$WINDOW_NAME" != 'bar' ]; then
+            WINDOW_NAME_NEW="$(echo $WINDOW_NAME | sed 's/^\(.\{0,'$WINDOW_NAME_MAX_LEN'\}\).*/\1/')"
+            if [ ${#WINDOW_NAME_NEW} -lt ${#WINDOW_NAME} ]; then
+                WINDOW_NAME_NEW="$WINDOW_NAME_NEW..."
+            fi
+            if [ "$w" = "$CURR_FOCUS" ]; then
+                echo -n "%{A:xdotool windowactivate $w:}%{+u}%{B$FOCUS_WINDOW_COL} ${WINDOW_NAME_NEW} %{B-}%{-u}${WINDOW_NAME_SEP}%{A}"
+            else
+                echo -n "%{A:xdotool windowactivate $w:} ${WINDOW_NAME_NEW} ${WINDOW_NAME_SEP}%{A}"
+            fi
+	    fi
+    done 
+}
+
+while true; do
+    echo -n "%{l}$(get_window_titles)"
+    echo -n "%{r} %{A:urxvt -e alsamixer &>/dev/null &: \n}VOL: $(get_volume)%{A}   "
+    echo -n "BAT: $(get_bat_level) ($(get_bat_status))   "
+    echo "%{A:gsimplecal &:}$(get_time) %{A}"
+    sleep 0.5
+done | lemonbar -b -u 2 -B#2d2d2d | sh
