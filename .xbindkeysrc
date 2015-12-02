@@ -1,0 +1,9 @@
+"~/scripts/vol_up.sh 5"
+  F12
+"~/scripts/vol_down.sh 5"
+  F11
+"~/scripts/vol_up.sh 1"
+  Shift+F12
+"~/scripts/vol_down.sh 1"
+  Shift+F11
+
