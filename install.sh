@@ -18,6 +18,7 @@ cp -rf . $HOME
 #Leftovers from copying all git repo files
 rm ~/README.md
 rm -rf ~/.git
+rm ~/install.sh
 
 $UPDATE_COMMAND
 
