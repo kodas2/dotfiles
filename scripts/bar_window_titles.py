@@ -66,6 +66,7 @@ def update_fifo():
     try:
         fifo.flush()
     except BrokenPipeError:
+        print("THERE'S A BREAK IN THE PIPE YO")
         exit(0)
         
 
@@ -92,4 +93,4 @@ def handle_update(line, stdin):
         
 
 sh.xprop("-spy", "-root", _out=handle_update)
-fifo.close()
+print("Ending script")

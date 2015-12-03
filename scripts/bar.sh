@@ -25,7 +25,12 @@ get_bat_status() {
 
 [ -e "$FIFO" ] || mkfifo "$FIFO"
 
-./bar_window_titles.py "$FIFO" &
+#Open the fifo for writing, so it doesn't close early
+exec 3<>"$FIFO"
+#Close fd 3 on exit
+trap "exec 3>&-" EXIT INT TERM
+
+~/scripts/bar_window_titles.py "$FIFO" &
 
 while true; do
     echo "UPDATE_TIME" > "$FIFO"
@@ -52,6 +57,7 @@ while read LINE; do
         BAR_BAT_LEVEL="$(get_bat_level)"
         BAR_BAT_STATUS="$(get_bat_status)"
     fi
+
     echo -n "%{l}$WINDOW_TITLES"
     echo -n "%{r} %{A:urxvt -e alsamixer &>/dev/null &: \n}VOL: $BAR_VOL%{A}   "
     echo -n "BAT: $BAR_BAT_LEVEL ($BAR_BAT_STATUS)   "
