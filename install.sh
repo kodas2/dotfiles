@@ -6,7 +6,7 @@ INSTALL_COMMAND="sudo pacman -S --noconfirm"
 AUR_COMMAND="makepkg -sri"
 PIP3_INSTALL_COMMAND="sudo pip install"
 pkgs=('base-devel' 'xbindkeys' 'xorg-xinit' 'xorg' 'openbox' 'rxvt-unicode'
-'rofi' 'python' 'vim' 'feh' 'git' 'python-pip' 'gsimplecal')
+'rofi' 'python' 'vim' 'feh' 'git' 'python-pip' 'gsimplecal' 'alsa-utils')
 aur_pkgs=('lemonbar-git' 'compton-git')
 pip3_pkgs=('sh')
 
